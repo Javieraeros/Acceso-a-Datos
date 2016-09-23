@@ -18,5 +18,21 @@ Create table Sorteo(
 	rein tinyint null,
 	constraint PK_Sorteo Primary key (IdSorteo)
 	)
-
-Create table 
+go
+Create table Boleto(
+	IdBoleto bigint not null, --No pongo identity porque el id del boleto se repetirá en diferentes sorteos
+	IdSorteo bigint not null,
+	Reintegro tinyint not null,
+	TipoApuesta tinyint not null    /**En esta columna guardaremos la cantidad de números que vamos a seleccionar*/
+	constraint PK_Boleto Primary key (IdBoleto,IdSorteo),
+	constraint FK_BoletoSorteo Foreign key (IdSorteo) references Sorteo(IdSorteo) on Update cascade on delete no action
+	)
+go
+Create table NumeroBoleto(
+	IdSorteo bigint not null,
+	IdBoleto bigint not null,
+	Numero tinyint not null,
+	constraint PK_NumeroBoleto Primary key (IdBoleto,numero),
+	constraint FK_NumeroBoleto_boleto Foreign key (IdSorteo,IdBoleto) references Boleto(IdSorteo,IdBoleto)
+		on Update cascade on Delete no action
+	)
