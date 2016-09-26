@@ -58,8 +58,8 @@ Create table NumeroBoleto(
 	constraint FK_NumeroBoleto_boleto Foreign key (IdBoleto,IdSorteo) references Boleto(IdBoleto,IdSorteo)
 		on Update cascade on Delete no action
 	)
-Use Master
-Drop database Primitiva
+
+
 --Programación parte 1
 
 --Implementa un procedimiento almacenado GrabaSencilla que grabe una apuesta simple. Datos de entrada: El sorteo y los seis números
@@ -71,7 +71,15 @@ CREATE PROCEDURE GrabaSencilla @IdSorteo bigint,
 							   @num1 tinyint,@num2 tinyint,@num3 tinyint,@num4 tinyint,@num5 tinyint,@num6 tinyint,
 							   @IdBoleto bigint OUTPUT as
 Begin
-	set @IdBoleto=NEWID()
+	--set @IdBoleto=NEWID() no vale
+
+	Select Top 1 @IdBoleto=IdBoleto+1 from Boleto
+	Order by IdBoleto desc
+
+	if (@IdBoleto is null)
+	Begin
+	set @IdBoleto=1
+	End
 	declare @Reintegro tinyint
 	set @Reintegro=RAND()*10
 
@@ -100,7 +108,3 @@ Begin
 	-- si no se han completado todos lso insert values
 End
 go
-
-Insert into Sorteo(IdSorteo,
-
-Execute GrabaSencilla 5, 1,2,3,4,5,6
