@@ -1,3 +1,25 @@
+--Implementar restricciones
+--Mediante restricciones check y triggers, asegurate de que se cumplen las siguientes reglas
+--No se puede insertar un boleto si queda menos de una hora para el sorteo. Tampoco para sorteos que ya hayan tenido lugar
+--Una vez insertado un boleto, no se pueden modificar sus números
+--Todos los números están comprendido entre 1 y 49
+--En las apuestas no se repiten números
+--Las apuestas sencillas tienen seis números
+--Las apuestas múltiples tienen5, 7, 8, 9, 10 u 11 números
+
+
+--Pruebas de rendimiento
+--Realiza inserciones de 10.000, 100.000, 500.000 y 1.000.000 de boletos y mide el tiempo y el tamaño de la base de datos
+--Anota los resultados en este formulario (uno por grupo)
+
+
+--Premios
+--Modifica la base de datos para que, una vez realizado el sorteo, se pueda asignar a cada boleto la cantidad ganada. 
+--Para ello, crea un procedimiento AsignarPremios que calcule los premios de cada boleto y lo guarde en la base de datos.
+--Para saber cómo se asignan los premios, debes seguir las instrucciones de este documento, en especial el Capítulo V del Título I 
+--(págs 7, 8, 9 y 10) y la tabla de la instrucción 21.4 (pág 14).
+
+
 Use Master
 If Not Exists(Select * from dbo.sysdatabases where name='Primitiva')
 	BEGIN
@@ -32,7 +54,53 @@ Create table NumeroBoleto(
 	IdSorteo bigint not null,
 	IdBoleto bigint not null,
 	Numero tinyint not null,
-	constraint PK_NumeroBoleto Primary key (IdBoleto,numero),
-	constraint FK_NumeroBoleto_boleto Foreign key (IdSorteo,IdBoleto) references Boleto(IdSorteo,IdBoleto)
+	constraint PK_NumeroBoleto Primary key (IdBoleto,Numero),
+	constraint FK_NumeroBoleto_boleto Foreign key (IdBoleto,IdSorteo) references Boleto(IdBoleto,IdSorteo)
 		on Update cascade on Delete no action
 	)
+Use Master
+Drop database Primitiva
+--Programación parte 1
+
+--Implementa un procedimiento almacenado GrabaSencilla que grabe una apuesta simple. Datos de entrada: El sorteo y los seis números
+--Implementa un procedimiento GrabaMuchasSencillas que genere n boletos con una apuesta sencilla utilizando el procedimiento GrabaSencilla.
+--Datos de entrada: El sorteo y el valor de n
+--Implementa un procedimiento almacenado GrabaMultiple que grabe una apuesta simple. Datos de entrada: El sorteo y entre 5 y 11 números
+go
+CREATE PROCEDURE GrabaSencilla @IdSorteo bigint,
+							   @num1 tinyint,@num2 tinyint,@num3 tinyint,@num4 tinyint,@num5 tinyint,@num6 tinyint,
+							   @IdBoleto bigint OUTPUT as
+Begin
+	set @IdBoleto=NEWID()
+	declare @Reintegro tinyint
+	set @Reintegro=RAND()*10
+
+	Insert into Boleto(IdBoleto,IdSorteo,Reintegro,TipoApuesta)
+	Values(@IdBoleto,@IdSorteo,@Reintegro,6)
+
+	Insert into NumeroBoleto(IdBoleto,IdSorteo,Numero)
+	Values(@IdBoleto,@IdSorteo,@num1)
+
+	Insert into NumeroBoleto(IdBoleto,IdSorteo,Numero)
+	Values(@IdBoleto,@IdSorteo,@num2)
+
+	Insert into NumeroBoleto(IdBoleto,IdSorteo,Numero)
+	Values(@IdBoleto,@IdSorteo,@num3)
+
+	Insert into NumeroBoleto(IdBoleto,IdSorteo,Numero)
+	Values(@IdBoleto,@IdSorteo,@num4)
+
+	Insert into NumeroBoleto(IdBoleto,IdSorteo,Numero)
+	Values(@IdBoleto,@IdSorteo,@num5)
+
+	Insert into NumeroBoleto(IdBoleto,IdSorteo,Numero)
+	Values(@IdBoleto,@IdSorteo,@num6)
+
+	--Crear trigger que elimine todos lso inserts de haber algún número que se repita, es decir
+	-- si no se han completado todos lso insert values
+End
+go
+
+Insert into Sorteo(IdSorteo,
+
+Execute GrabaSencilla 5, 1,2,3,4,5,6
