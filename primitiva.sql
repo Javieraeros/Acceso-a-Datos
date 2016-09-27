@@ -63,16 +63,12 @@ Create table NumeroBoleto(
 --Programación parte 1
 
 --Implementa un procedimiento almacenado GrabaSencilla que grabe una apuesta simple. Datos de entrada: El sorteo y los seis números
---Implementa un procedimiento GrabaMuchasSencillas que genere n boletos con una apuesta sencilla utilizando el procedimiento GrabaSencilla.
---Datos de entrada: El sorteo y el valor de n
---Implementa un procedimiento almacenado GrabaMultiple que grabe una apuesta simple. Datos de entrada: El sorteo y entre 5 y 11 números
 go
 CREATE PROCEDURE GrabaSencilla @IdSorteo bigint,
 							   @num1 tinyint,@num2 tinyint,@num3 tinyint,@num4 tinyint,@num5 tinyint,@num6 tinyint,
 							   @IdBoleto bigint OUTPUT as
 Begin
 	--set @IdBoleto=NEWID() no vale
-
 	Select Top 1 @IdBoleto=IdBoleto+1 from Boleto
 	Order by IdBoleto desc
 
@@ -82,10 +78,12 @@ Begin
 	End
 	declare @Reintegro tinyint
 	set @Reintegro=RAND()*10
-
+	
 	Insert into Boleto(IdBoleto,IdSorteo,Reintegro,TipoApuesta)
 	Values(@IdBoleto,@IdSorteo,@Reintegro,6)
 
+	/*
+	--------------------Versión 1.0--------------------
 	Insert into NumeroBoleto(IdBoleto,IdSorteo,Numero)
 	Values(@IdBoleto,@IdSorteo,@num1)
 
@@ -103,8 +101,40 @@ Begin
 
 	Insert into NumeroBoleto(IdBoleto,IdSorteo,Numero)
 	Values(@IdBoleto,@IdSorteo,@num6)
+	*/
+
+
+	DECLARE @Numeros as TABLE(
+	IdSorteo bigint not null,
+	IdBoleto bigint not null,
+	Numero tinyint not null)
+	Insert into @Numeros(IdSorteo,IdBoleto,Numero)
+			Values(@IdSorteo,@IdBoleto,@num1),
+			(@IdSorteo,@IdBoleto,@num2),
+			(@IdSorteo,@IdBoleto,@num3),
+			(@IdSorteo,@IdBoleto,@num4),
+			(@IdSorteo,@IdBoleto,@num5),
+			(@IdSorteo,@IdBoleto,@num6)
+
+	Insert into NumeroBoleto(IdSorteo,IdBoleto,Numero)
+		Select * from @Numeros
 
 	--Crear trigger que elimine todos lso inserts de haber algún número que se repita, es decir
 	-- si no se han completado todos lso insert values
 End
 go
+
+--Implementa un procedimiento GrabaMuchasSencillas que genere n boletos con una apuesta sencilla utilizando el procedimiento GrabaSencilla.
+--Datos de entrada: El sorteo y el valor de n
+Create Procedure GrabaMuchasSencillas @IdSorteo bigint, @cantidadboletos int as
+Begin
+	declare @contador int
+	declare @num1 @num2 @num3 @num4 @num5 @num6 int
+	set @contador=0
+	while @contador<@cantidadboletos
+	Begin
+		
+	End
+End
+
+--Implementa un procedimiento almacenado GrabaMultiple que grabe una apuesta simple. Datos de entrada: El sorteo y entre 5 y 11 números
