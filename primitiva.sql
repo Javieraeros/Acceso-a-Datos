@@ -64,7 +64,7 @@ Create table NumeroBoleto(
 
 --Implementa un procedimiento almacenado GrabaSencilla que grabe una apuesta simple. Datos de entrada: El sorteo y los seis números
 go
-ALTER PROCEDURE GrabaSencilla @IdSorteo bigint,
+CREATE PROCEDURE GrabaSencilla @IdSorteo bigint,
 							   @num1 tinyint,@num2 tinyint,@num3 tinyint,@num4 tinyint,@num5 tinyint,@num6 tinyint,
 							   @IdBoleto bigint OUTPUT as
 Begin
@@ -126,7 +126,7 @@ go
 
 --Implementa un procedimiento GrabaMuchasSencillas que genere n boletos con una apuesta sencilla utilizando el procedimiento GrabaSencilla.
 --Datos de entrada: El sorteo y el valor de n
-Alter Procedure GrabaMuchasSencillas @IdSorteo bigint, @cantidadboletos int as
+CREATE Procedure GrabaMuchasSencillas @IdSorteo bigint, @cantidadboletos int as
 Begin
 	declare @contador int
 	declare @num1 int,@num2 int,@num3 int,@num4 int,@num5 int,@num6 int
