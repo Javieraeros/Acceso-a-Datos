@@ -64,7 +64,7 @@ Create table NumeroBoleto(
 
 --Implementa un procedimiento almacenado GrabaSencilla que grabe una apuesta simple. Datos de entrada: El sorteo y los seis números
 go
-CREATE PROCEDURE GrabaSencilla @IdSorteo bigint,
+ALTER PROCEDURE GrabaSencilla @IdSorteo bigint,
 							   @num1 tinyint,@num2 tinyint,@num3 tinyint,@num4 tinyint,@num5 tinyint,@num6 tinyint,
 							   @IdBoleto bigint OUTPUT as
 Begin
@@ -77,7 +77,7 @@ Begin
 	set @IdBoleto=1
 	End
 	declare @Reintegro tinyint
-	set @Reintegro=RAND()*10
+	set @Reintegro=ABS(checksum(NEWID()))%10
 	
 	Insert into Boleto(IdBoleto,IdSorteo,Reintegro,TipoApuesta)
 	Values(@IdBoleto,@IdSorteo,@Reintegro,6)
@@ -126,15 +126,55 @@ go
 
 --Implementa un procedimiento GrabaMuchasSencillas que genere n boletos con una apuesta sencilla utilizando el procedimiento GrabaSencilla.
 --Datos de entrada: El sorteo y el valor de n
-Create Procedure GrabaMuchasSencillas @IdSorteo bigint, @cantidadboletos int as
+Alter Procedure GrabaMuchasSencillas @IdSorteo bigint, @cantidadboletos int as
 Begin
 	declare @contador int
-	declare @num1 @num2 @num3 @num4 @num5 @num6 int
+	declare @num1 int,@num2 int,@num3 int,@num4 int,@num5 int,@num6 int
+	declare @idBoleto bigint
+	set @num2=0
+	set @num3=0
+	set @num4=0
+	set @num5=0
+	set @num6=0 
 	set @contador=0
 	while @contador<@cantidadboletos
 	Begin
+		set @num1=ABS(checksum(NEWID()))%49+1
+		while @num2=0 or @num1=@num2
+		Begin 
+			set @num2=ABS(checksum(NEWID()))%49+1
+		End
+
+		while @num3=0 or @num3=@num2 or @num3=@num1
+		begin
+			set @num3=ABS(checksum(NEWID()))%49+1
+		end
+
+		while @num4=0 or @num4=@num3 or @num4=@num2 or @num4=@num1
+		begin
+			set @num4=ABS(checksum(NEWID()))%49+1
+		end
+
+		while @num5=0 or @num5=@num4 or @num5=@num3 or @num5=@num2 or @num5=@num1
+		begin
+			set @num5=ABS(checksum(NEWID()))%49+1
+		end
+
+		while @num6=0 or @num6=@num5 or @num6=@num4 or @num6=@num3 or @num6=@num2 or @num6=@num1
+		begin
+			set @num6=ABS(checksum(NEWID()))%49+1
+		end
+
+		Execute GrabaSencilla @IdSorteo,@num1,@num2,@num3,@num4,@num5,@num6,@idBoleto
 		
+		set @contador=@contador+1
+
+		set @num2=0
+		set @num3=0
+		set @num4=0
+		set @num5=0
+		set @num6=0 
 	End
 End
 
---Implementa un procedimiento almacenado GrabaMultiple que grabe una apuesta simple. Datos de entrada: El sorteo y entre 5 y 11 números
+--Implementa un procedimiento almacenado GrabaMultiple que grabe una apuesta multiple. Datos de entrada: El sorteo y entre 5 y 11 números

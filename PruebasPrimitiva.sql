@@ -6,3 +6,10 @@ declare @IdBoleto bigint
 Execute GrabaSencilla 8, 1,2,3,4,5,6,@IdBoleto
 Select * from Boleto
 Select * from NumeroBoleto
+ORDER BY Numero
+select * from Sorteo
+
+Execute GrabaMuchasSencillas 8,100
+
+delete from NumeroBoleto
+
