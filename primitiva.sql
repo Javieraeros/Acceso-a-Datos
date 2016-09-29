@@ -178,3 +178,48 @@ Begin
 End
 
 --Implementa un procedimiento almacenado GrabaMultiple que grabe una apuesta multiple. Datos de entrada: El sorteo y entre 5 y 11 números
+go
+CREATE PROCEDURE Grabamultiple @IdSorteo bigint, @num1 tinyint,@num2 tinyint,@num3 tinyint,@num4 tinyint,@num5 tinyint,@num6 tinyint=0,
+								@num7 tinyint=0,@num8 tinyint=0,@num9 tinyint=0,@num10 tinyint=0,@num11 tinyint=0 as
+Begin
+	Declare @IdBoleto bigint
+	Declare @TipoApuesta tinyint
+
+	Select Top 1 @IdBoleto=IdBoleto+1 from Boleto
+	Order by IdBoleto desc
+
+	if (@IdBoleto is null)
+	Begin
+	set @IdBoleto=1
+	End
+	declare @Reintegro tinyint
+	set @Reintegro=ABS(checksum(NEWID()))%10
+
+	if(@num11<>0)
+		set @TipoApuesta=11
+	else
+		if(@num10<>0)
+			set @TipoApuesta=10
+		else
+			if(@num9<>0)
+				set @TipoApuesta=9
+			else
+				if(@num8<>0)
+					set @TipoApuesta=8
+				else
+					if(@num7<>0)
+						set @TipoApuesta=7
+					else
+						if(@num6<>0)
+							set @TipoApuesta=6
+						else
+							set @TipoApuesta=5
+				
+
+	Insert into Boleto(IdSorteo,IdBoleto,Reintegro,TipoApuesta)
+	values(@IdSorteo,@IdBoleto,@Reintegro,@TipoApuesta)
+
+
+
+End
+go
