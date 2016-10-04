@@ -42,15 +42,17 @@ Create table NumeroBoleto(
 
 --Implementa un procedimiento almacenado GrabaSencilla que grabe una apuesta simple. Datos de entrada: El sorteo y los seis números
 go
-CREATE PROCEDURE GrabaSencilla @IdSorteo bigint,
+ALTER PROCEDURE GrabaSencilla @IdSorteo bigint,
 							   @num1 tinyint,@num2 tinyint,@num3 tinyint,@num4 tinyint,@num5 tinyint,@num6 tinyint,
 							   @IdBoleto bigint OUTPUT as
 Begin
 	If(@num1<> @num2 and @num1<>@num3 and @num1<>@num4 and @num1<>@num5 and @num1<>@num6
 		 and @num2<>@num3 and @num2<>@num4 and @num2<>@num5 and @num2<>@num6
 		 and @num3<>@num4 and @num3<>@num5 and @num3<>@num6
-		 and @num4<>@num5 and @num4<>@num6 and @num5<>@num6)
+		 and @num4<>@num5 and @num4<>@num6 
+		 and @num5<>@num6)
 	Begin
+	Begin Transaction
 		--set @IdBoleto=NEWID() no vale
 		Select Top 1 @IdBoleto=IdBoleto+1 from Boleto where IdSorteo=@IdSorteo
 		Order by IdBoleto desc
@@ -98,12 +100,13 @@ Begin
 				(@IdSorteo,@IdBoleto,@num4),
 				(@IdSorteo,@IdBoleto,@num5),
 				(@IdSorteo,@IdBoleto,@num6)
+		
 
 		Insert into NumeroBoleto(IdSorteo,IdBoleto,Numero)
 			Select * from @Numeros
 
-		--Crear trigger que elimine todos lso inserts de haber algún número que se repita, es decir
-		-- si no se han completado todos lso insert values
+		--Crear trigger que elimine todos lso inserts de haber algún número que no sea válido, además
+		--de que elimine el boleto!!
 	End
 	else
 	Begin
@@ -269,10 +272,33 @@ go
 --Mediante restricciones check y triggers, asegurate de que se cumplen las siguientes reglas
 --No se puede insertar un boleto si queda menos de una hora para el sorteo. Tampoco para sorteos que ya hayan tenido lugar
 --Una vez insertado un boleto, no se pueden modificar sus números
+
+Go
+Create Trigger InsertarBoletoInvalido ON Boleto After insert,Update AS
+	declare @fechaSorteo smalldatetime
+	select @fechaSorteo =FechaSorteo from Sorteo where (Select IdSorteo from inserted)=IdSorteo
+
+	If(DateDiff(hour,Current_TimeStamp,@fechaSorteo)<1)
+	Begin
+		RollBack Transaction
+	End 
+Go
+
 --Todos los números están comprendido entre 1 y 49
+Alter Table NumeroBoleto add constraint CK_NumerosValidos check (Numero between 1 and 49)
+go
+Create Trigger NumeroValido on NumeroBoleto After insert,Update AS
+	If (Select numero from inserted1)
+Go
+
 --En las apuestas no se repiten números
+
+/*Ya implementada en la base de datos mediante la inserción del número en la primary key*/
+
 --Las apuestas sencillas tienen seis números
 --Las apuestas múltiples tienen5, 7, 8, 9, 10 u 11 números
+
+
 
 
 --Pruebas de rendimiento
