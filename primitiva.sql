@@ -42,7 +42,7 @@ Create table NumeroBoleto(
 
 --Implementa un procedimiento almacenado GrabaSencilla que grabe una apuesta simple. Datos de entrada: El sorteo y los seis números
 go
-ALTER PROCEDURE GrabaSencilla @IdSorteo bigint,
+CREATE PROCEDURE GrabaSencilla @IdSorteo bigint,
 							   @num1 tinyint,@num2 tinyint,@num3 tinyint,@num4 tinyint,@num5 tinyint,@num6 tinyint,
 							   @IdBoleto bigint OUTPUT as
 Begin
@@ -52,10 +52,10 @@ Begin
 		 and @num4<>@num5 and @num4<>@num6 
 		 and @num5<>@num6)
 	Begin
-	Begin Transaction
+	
 		--set @IdBoleto=NEWID() no vale
-		Select Top 1 @IdBoleto=IdBoleto+1 from Boleto where IdSorteo=@IdSorteo
-		Order by IdBoleto desc
+		Select @IdBoleto=max(IdBoleto)+1 from Boleto 
+		where IdSorteo=@IdSorteo
 
 		if (@IdBoleto is null)
 		Begin
@@ -63,7 +63,10 @@ Begin
 		End
 		declare @Reintegro tinyint
 		set @Reintegro=ABS(checksum(NEWID()))%10
-	
+
+		declare @SeFastidio bit=0
+
+		Begin Transaction
 		Insert into Boleto(IdBoleto,IdSorteo,Reintegro,TipoApuesta)
 		Values(@IdBoleto,@IdSorteo,@Reintegro,6)
 
@@ -101,10 +104,16 @@ Begin
 				(@IdSorteo,@IdBoleto,@num5),
 				(@IdSorteo,@IdBoleto,@num6)
 		
-
-		Insert into NumeroBoleto(IdSorteo,IdBoleto,Numero)
+		BEGIN TRY  
+   		Insert into NumeroBoleto(IdSorteo,IdBoleto,Numero)
 			Select * from @Numeros
-
+		END TRY  
+		BEGIN CATCH  
+			SET @SeFastidio = 1
+			ROLLBACK
+		END CATCH
+		IF @SeFastidio <> 1
+			Commit Transaction
 		--Crear trigger que elimine todos lso inserts de haber algún número que no sea válido, además
 		--de que elimine el boleto!!
 	End
@@ -271,24 +280,34 @@ go
 --Implementar restricciones
 --Mediante restricciones check y triggers, asegurate de que se cumplen las siguientes reglas
 --No se puede insertar un boleto si queda menos de una hora para el sorteo. Tampoco para sorteos que ya hayan tenido lugar
---Una vez insertado un boleto, no se pueden modificar sus números
+
 
 Go
 Create Trigger InsertarBoletoInvalido ON Boleto After insert,Update AS
 	declare @fechaSorteo smalldatetime
 	select @fechaSorteo =FechaSorteo from Sorteo where (Select IdSorteo from inserted)=IdSorteo
 
-	If(DateDiff(hour,Current_TimeStamp,@fechaSorteo)<1)
+	If(DateDiff(minute,Current_TimeStamp,@fechaSorteo)<60)
 	Begin
 		RollBack Transaction
 	End 
 Go
 
+--Una vez insertado un boleto, no se pueden modificar sus números
+
+Create Trigger Tramposo ON NumeroBoleto Instead of Update AS
+Raiserror('No puedes pasar!!!',16,1)
+go
+
+
 --Todos los números están comprendido entre 1 y 49
 Alter Table NumeroBoleto add constraint CK_NumerosValidos check (Numero between 1 and 49)
 go
-Create Trigger NumeroValido on NumeroBoleto After insert,Update AS
-	If (Select numero from inserted1)
+/*Create Trigger NumeroValido on NumeroBoleto After insert,Update AS
+	If ((Select numero from inserted1) any between 1 and 49)
+	BEGIN
+			
+	END*/
 Go
 
 --En las apuestas no se repiten números
@@ -298,7 +317,7 @@ Go
 --Las apuestas sencillas tienen seis números
 --Las apuestas múltiples tienen5, 7, 8, 9, 10 u 11 números
 
-
+/*Ya implementada en los diferentes procedimientos*/
 
 
 --Pruebas de rendimiento
