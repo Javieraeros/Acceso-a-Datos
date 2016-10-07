@@ -114,8 +114,6 @@ Begin
 		END CATCH
 		IF @SeFastidio <> 1
 			Commit Transaction
-		--Crear trigger que elimine todos lso inserts de haber algún número que no sea válido, además
-		--de que elimine el boleto!!
 	End
 	else
 	Begin
@@ -295,20 +293,15 @@ Go
 
 --Una vez insertado un boleto, no se pueden modificar sus números
 
-Create Trigger Tramposo ON NumeroBoleto Instead of Update AS
+Create Trigger Tramposo ON NumeroBoleto for Update AS
 Raiserror('No puedes pasar!!!',16,1)
+rollback transaction
 go
 
 
 --Todos los números están comprendido entre 1 y 49
 Alter Table NumeroBoleto add constraint CK_NumerosValidos check (Numero between 1 and 49)
 go
-/*Create Trigger NumeroValido on NumeroBoleto After insert,Update AS
-	If ((Select numero from inserted1) any between 1 and 49)
-	BEGIN
-			
-	END*/
-Go
 
 --En las apuestas no se repiten números
 
@@ -320,9 +313,18 @@ Go
 /*Ya implementada en los diferentes procedimientos*/
 
 
+
 --Pruebas de rendimiento
 --Realiza inserciones de 10.000, 100.000, 500.000 y 1.000.000 de boletos y mide el tiempo y el tamaño de la base de datos
 --Anota los resultados en este formulario (uno por grupo)
+Insert into Sorteo(IdSorteo,FechaSorteo)
+Values(15,'20161110')
+Execute GrabaMuchasSencillas 15,10000
+Execute GrabaMuchasSencillas 15,100000
+Execute GrabaMuchasSencillas 15,500000
+Execute GrabaMuchasSencillas 15,1000000
+
+
 
 
 --Premios

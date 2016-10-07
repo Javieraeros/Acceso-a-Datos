@@ -23,3 +23,5 @@ Values (10,'20161105')
 
 declare @IdBoleto bigint
 Execute GrabaSencilla 10, 1,2,3,4,5,90,@IdBoleto
+
+Update NumeroBoleto set Numero=8 where Numero=5 
