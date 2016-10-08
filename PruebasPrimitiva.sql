@@ -2,9 +2,9 @@ Use PrimitivaJavi
 go
 set dateformat 'ymd' 
 Insert into Sorteo(IdSorteo,FechaSorteo)
-Values (8,CURRENT_TIMESTAMP)
+Values (100,'20171008')
 declare @IdBoleto bigint
-Execute GrabaSencilla 8, 1,2,3,4,5,6,@IdBoleto
+Execute GrabaSencilla 100, 1,2,3,4,5,6,@IdBoleto
 Select * from Boleto
 Select * from NumeroBoleto
 ORDER BY Numero
@@ -25,3 +25,15 @@ declare @IdBoleto bigint
 Execute GrabaSencilla 10, 1,2,3,4,5,90,@IdBoleto
 
 Update NumeroBoleto set Numero=8 where Numero=5 
+
+
+
+--Pruebas de rendimiento
+--Realiza inserciones de 10.000, 100.000, 500.000 y 1.000.000 de boletos y mide el tiempo y el tamaño de la base de datos
+--Anota los resultados en este formulario (uno por grupo)
+Insert into Sorteo(IdSorteo,FechaSorteo)
+Values(15,'20161110')
+Execute GrabaMuchasSencillas 15,10000
+Execute GrabaMuchasSencillas 15,100000
+Execute GrabaMuchasSencillas 15,500000
+Execute GrabaMuchasSencillas 15,1000000
