@@ -2,6 +2,17 @@
 Use PrimitivaJavi
 --Modifica la base de datos para que, una vez realizado el sorteo, se pueda asignar a cada boleto la cantidad ganada.
 Alter table Boleto add Premios smallmoney null
+Create Table Premio(
+			TipoApuesta tinyint,
+			NumerosAcertados tinyint,
+			Especial tinyint,
+			Primera tinyint,
+			Segunda tinyint,
+			Tercera tinyint,
+			Cuarta tinyint,
+			Quinta tinyint,
+			constraint PK_Premio primary key (TipoApuesta,NumerosAcertados)
+			)
 
 
 /*
@@ -21,7 +32,7 @@ Salida:El número de aciertos:
 				-9 para 6 aciertos más el reintegro
 				-10 para 6 aciertos, el complementario y el reintegro
 				- "-1" para el reintegro solo
-*/
+
 go
 Create function compruebaAciertos (@IdSorteo bigint,@Idboleto bigint) returns tinyint as
 Begin
@@ -46,6 +57,7 @@ Begin
 	End
 	return @aciertos 
 End
+*/
 go
 --Para ello, crea un procedimiento AsignarPremios que calcule los premios de cada boleto y lo guarde en la base de datos.
 --Para saber cómo se asignan los premios, debes seguir las instrucciones de este documento, en especial el Capítulo V del Título I 
@@ -79,6 +91,22 @@ Begin
 	--Guardamos en una tabla el id del boleto, la cantidad de aciertos y su premio correspondiente:
 	create Table #tablaAciertos (IdBoleto bigint,Aciertos tinyint,Premio smallmoney)
 	Insert into #tablaAciertos(IdBoleto) Select IdBoleto from Boleto where IdSorteo=@IdSorteo
-	If(
+	--If(
+
+	declare @tablaSorteo as Table (NumeroSorteo tinyint)
+	insert into @tablaSorteo Select num1 from Sorteo where IdSorteo=@IdSorteo
+	insert into @tablaSorteo Select num2 from Sorteo where IdSorteo=@IdSorteo
+	insert into @tablaSorteo Select num3 from Sorteo where IdSorteo=@IdSorteo
+	insert into @tablaSorteo Select num4 from Sorteo where IdSorteo=@IdSorteo
+	insert into @tablaSorteo Select num5 from Sorteo where IdSorteo=@IdSorteo
+	insert into @tablaSorteo Select num6 from Sorteo where IdSorteo=@IdSorteo
+
+	Select IdBoleto, count(*) from NumeroBoleto as NB
+	inner join @tablaSorteo as TS
+	on NB.Numero=TS.NumeroSorteo
+	where NB.IdSorteo=@IdSorteo
+	group by IdBoleto
+	
+
 End
 
