@@ -33,7 +33,7 @@ Create Table BoletoPremio (
 			Cuarta tinyint,
 			Quinta tinyint,
 			constraint PK_BoletoPremio primary key (IdSorteo,IdBoleto),
-			constraint FK_BoletoPremio_Boleto foreign key (IdSorteo,IdBoleto) references Boleto(IdSorteo,IdBoleto)
+			constraint FK_BoletoPremio_Boleto foreign key (IdSorteo,IdBoleto) references Boleto(IdSorteo,IdBoleto))
 
 /*
 Create function compruebaAciertos (IdSorteo bigint,IdBoleto bigint) return int as
