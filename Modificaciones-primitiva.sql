@@ -2,6 +2,16 @@
 Use PrimitivaJavi
 --Modifica la base de datos para que, una vez realizado el sorteo, se pueda asignar a cada boleto la cantidad ganada.
 Alter table Boleto add Premios smallmoney null
+/*		-3 para tres aciertos
+		-4 para cuatro aciertos
+		-5 para cinco aciertos
+		-6 para cinco aciertos más el complementario
+		-7 para 6 aciertos
+		-8 para 6 aciertos más el complementario
+		-9 para 6 aciertos más el reintegro
+		-10 para 6 aciertos, el complementario y el reintegro
+		- "-1" para el reintegro solo
+*/		
 Create Table Premio(
 			TipoApuesta tinyint,
 			NumerosAcertados tinyint,
@@ -13,25 +23,23 @@ Create Table Premio(
 			Quinta tinyint,
 			constraint PK_Premio primary key (TipoApuesta,NumerosAcertados)
 			)
-
+Create Table BoletoPremio (
+			IdSorteo bigInt,
+			IdBoleto bigInt,
+			Especial tinyint,
+			Primera tinyint,
+			Segunda tinyint,
+			Tercera tinyint,
+			Cuarta tinyint,
+			Quinta tinyint,
+			constraint PK_BoletoPremio primary key (IdSorteo,IdBoleto),
+			constraint FK_BoletoPremio_Boleto foreign key (IdSorteo,IdBoleto) references Boleto(IdSorteo,IdBoleto)
 
 /*
 Create function compruebaAciertos (IdSorteo bigint,IdBoleto bigint) return int as
 Funcion que devuelve el número de aciertos de un boleto, independientemente del tipo de boleto que sea
 Entrada:El id del sorteo y el id del boleto
 Salida:El número de aciertos:
-				-0 para cero aciertos
-				-1 para un aciertos
-				-2 para dos aciertos
-				-3 para tres aciertos
-				-4 para cuatro aciertos
-				-5 para cinco aciertos
-				-6 para cinco aciertos más el complementario
-				-7 para 6 aciertos
-				-8 para 6 aciertos más el complementario
-				-9 para 6 aciertos más el reintegro
-				-10 para 6 aciertos, el complementario y el reintegro
-				- "-1" para el reintegro solo
 
 go
 Create function compruebaAciertos (@IdSorteo bigint,@Idboleto bigint) returns tinyint as
