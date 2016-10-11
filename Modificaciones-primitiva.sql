@@ -12,7 +12,7 @@ Alter table Boleto add Premios smallmoney null
 		-10 para 6 aciertos, el complementario y el reintegro
 		- "-1" para el reintegro solo
 */		
-Create Table Premio(
+Create Table Premios(
 			TipoApuesta tinyint,
 			NumerosAcertados tinyint,
 			Especial tinyint,
@@ -23,7 +23,26 @@ Create Table Premio(
 			Quinta tinyint,
 			constraint PK_Premio primary key (TipoApuesta,NumerosAcertados)
 			)
-Create Table BoletoPremio (
+Insert into Premios(TipoApuesta,NumerosAcertados,Especial,Primera,Segunda,Tercera,
+					Cuarta,Quinta)
+			Values(7,10,1,1,6,0,0,0),
+				  (7,9,1,1,0,6,0,0),
+				  (7,8,0,1,6,0,0,0),
+				  (7,7,0,1,0,6,0,0),
+				  (7,6,0,0,1,1,5,0),
+				  (7,5,0,0,0,2,5,0),
+				  (7,4,0,0,0,0,3,4),
+				  (7,3,0,0,0,0,0,4),
+				  (8,10,1,1,6,6,15,0),
+				  (8,9,1,1,0,12,15,0),
+				  (8,8,0,1,6,6,15,0),
+				  (8,7,0,1,0,12,15,0),
+				  (8,6,0,0,1,2,15,10),
+				  (8,5,0,0,0,3,15,10),
+				  (8,4,0,0,0,0,6,16),
+				  (8,3,0,0,0,0,0,10),
+
+Create Table BoletosPremios (
 			IdSorteo bigInt,
 			IdBoleto bigInt,
 			Especial tinyint,

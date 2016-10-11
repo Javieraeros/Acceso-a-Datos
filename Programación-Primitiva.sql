@@ -16,7 +16,7 @@ Begin
 	Begin
 	
 		--set @IdBoleto=NEWID() no vale
-		Select @IdBoleto=max(IdBoleto)+1 from Boleto 
+		Select @IdBoleto=max(IdBoleto)+1 from Boletos
 		where IdSorteo=@IdSorteo
 
 		if (@IdBoleto is null)
@@ -29,7 +29,7 @@ Begin
 		declare @SeFastidio bit=0
 
 		Begin Transaction
-		Insert into Boleto(IdBoleto,IdSorteo,Reintegro,TipoApuesta)
+		Insert into Boletos(IdBoleto,IdSorteo,Reintegro,TipoApuesta)
 		Values(@IdBoleto,@IdSorteo,@Reintegro,6)
 
 		/*
@@ -67,7 +67,7 @@ Begin
 				(@IdSorteo,@IdBoleto,@num6)
 		
 		BEGIN TRY  
-   		Insert into NumeroBoleto(IdSorteo,IdBoleto,Numero)
+   		Insert into NumerosBoletos(IdSorteo,IdBoleto,Numero)
 			Select * from @Numeros
 		END TRY  
 		BEGIN CATCH  
@@ -158,7 +158,7 @@ Begin
 		Declare @IdBoleto bigint
 		Declare @TipoApuesta tinyint
 
-		Select Top 1 @IdBoleto=IdBoleto+1 from Boleto where IdSorteo=@IdSorteo
+		Select Top 1 @IdBoleto=IdBoleto+1 from Boletos where IdSorteo=@IdSorteo
 		Order by IdBoleto desc
 
 		if (@IdBoleto is null)
@@ -188,46 +188,46 @@ Begin
 		else
 			set @TipoApuesta=5
 				
-		Insert into Boleto(IdSorteo,IdBoleto,Reintegro,TipoApuesta)
+		Insert into Boletos(IdSorteo,IdBoleto,Reintegro,TipoApuesta)
 		values(@IdSorteo,@IdBoleto,@Reintegro,@TipoApuesta)
 
-		Insert into NumeroBoleto(IdSorteo,IdBoleto,Numero)
+		Insert into NumerosBoletos(IdSorteo,IdBoleto,Numero)
 		values(@IdSorteo,@IdBoleto,@num1)
 
-		Insert into NumeroBoleto(IdSorteo,IdBoleto,Numero)
+		Insert into NumerosBoletos(IdSorteo,IdBoleto,Numero)
 		values(@IdSorteo,@IdBoleto,@num2)
 
-		Insert into NumeroBoleto(IdSorteo,IdBoleto,Numero)
+		Insert into NumerosBoletos(IdSorteo,IdBoleto,Numero)
 		values(@IdSorteo,@IdBoleto,@num3)
 
-		Insert into NumeroBoleto(IdSorteo,IdBoleto,Numero)
+		Insert into NumerosBoletos(IdSorteo,IdBoleto,Numero)
 		values(@IdSorteo,@IdBoleto,@num4)
 
-		Insert into NumeroBoleto(IdSorteo,IdBoleto,Numero)
+		Insert into NumerosBoletos(IdSorteo,IdBoleto,Numero)
 		values(@IdSorteo,@IdBoleto,@num5)
 
 		If(@TipoApuesta>=6)
-		Insert into NumeroBoleto(IdSorteo,IdBoleto,Numero)
+		Insert into NumerosBoletos(IdSorteo,IdBoleto,Numero)
 		values(@IdSorteo,@IdBoleto,@num6)
 		
 		If(@TipoApuesta>=7)
-		Insert into NumeroBoleto(IdSorteo,IdBoleto,Numero)
+		Insert into NumerosBoletos(IdSorteo,IdBoleto,Numero)
 		values(@IdSorteo,@IdBoleto,@num7)
 
 		If(@TipoApuesta>=8)
-		Insert into NumeroBoleto(IdSorteo,IdBoleto,Numero)
+		Insert into NumerosBoletos(IdSorteo,IdBoleto,Numero)
 		values(@IdSorteo,@IdBoleto,@num8)
 
 		If(@TipoApuesta>=9)
-		Insert into NumeroBoleto(IdSorteo,IdBoleto,Numero)
+		Insert into NumerosBoletos(IdSorteo,IdBoleto,Numero)
 		values(@IdSorteo,@IdBoleto,@num9)
 
 		If(@TipoApuesta>=10)
-		Insert into NumeroBoleto(IdSorteo,IdBoleto,Numero)
+		Insert into NumerosBoletos(IdSorteo,IdBoleto,Numero)
 		values(@IdSorteo,@IdBoleto,@num10)
 
 		If(@TipoApuesta=11)
-		Insert into NumeroBoleto(IdSorteo,IdBoleto,Numero)
+		Insert into NumerosBoletos(IdSorteo,IdBoleto,Numero)
 		values(@IdSorteo,@IdBoleto,@num11)
 	End
 	Else
