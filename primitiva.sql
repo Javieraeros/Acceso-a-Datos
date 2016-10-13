@@ -1,11 +1,12 @@
 Use Master
+
 If Not Exists(Select * from dbo.sysdatabases where name='PrimitivaJavi')
 	BEGIN
 	Create Database PrimitivaJavi
 	END
 GO
 Use PrimitivaJavi
-Create table Sorteo(
+Create table Sorteos(
 	IdSorteo bigint not null,
 	FechaSorteo smalldatetime not null,
 	num1 tinyint null,
@@ -19,21 +20,21 @@ Create table Sorteo(
 	constraint PK_Sorteo Primary key (IdSorteo)
 	)
 go
-Create table Boleto(
+Create table Boletos(
 	IdBoleto bigint not null, --No pongo identity porque el id del boleto se repetirá en diferentes sorteos
 	IdSorteo bigint not null,
 	Reintegro tinyint not null,
 	TipoApuesta tinyint not null    /**En esta columna guardaremos la cantidad de números que vamos a seleccionar*/
-	constraint PK_Boleto Primary key (IdBoleto,IdSorteo),
-	constraint FK_BoletoSorteo Foreign key (IdSorteo) references Sorteo(IdSorteo) on Update cascade on delete no action
+	constraint PK_Boletos Primary key (IdBoleto,IdSorteo),
+	constraint FK_BoletosSorteos Foreign key (IdSorteo) references Sorteos(IdSorteo) on Update cascade on delete no action
 	)
 go
-Create table NumeroBoleto(
+Create table NumerosBoletos(
 	IdSorteo bigint not null,
 	IdBoleto bigint not null,
 	Numero tinyint not null,
-	constraint PK_NumeroBoleto Primary key (IdSorteo,IdBoleto,Numero),
-	constraint FK_NumeroBoleto_boleto Foreign key (IdBoleto,IdSorteo) references Boleto(IdBoleto,IdSorteo)
+	constraint PK_NumerosBoletos Primary key (IdSorteo,IdBoleto,Numero),
+	constraint FK_NumerosBoletos_boletos Foreign key (IdBoleto,IdSorteo) references Boletos(IdBoleto,IdSorteo)
 		on Update cascade on Delete no action
 	)
 
