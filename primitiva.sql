@@ -1,5 +1,4 @@
 Use Master
-
 If Not Exists(Select * from dbo.sysdatabases where name='PrimitivaJavi')
 	BEGIN
 	Create Database PrimitivaJavi

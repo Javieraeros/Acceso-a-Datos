@@ -26,22 +26,14 @@ Create Table Premios(
 			)
 Insert into Premios(TipoApuesta,NumerosAcertados,Especial,Primera,Segunda,Tercera,
 					Cuarta,Quinta)
-			Values(7,69,1,1,6,0,0,0),
-				  (7,15,1,1,0,6,0,0),
-				  (7,60,0,1,6,0,0,0),
-				  (7,6,0,1,0,6,0,0),
-				  (7,50,0,0,1,1,5,0),
-				  (7,5,0,0,0,2,5,0),
-				  (7,4,0,0,0,0,3,4),
-				  (7,3,0,0,0,0,0,4),
-				  (8,10,1,1,6,6,15,0),
-				  (8,9,1,1,0,12,15,0),
-				  (8,8,0,1,6,6,15,0),
-				  (8,7,0,1,0,12,15,0),
-				  (8,6,0,0,1,2,15,10),
-				  (8,5,0,0,0,3,15,10),
-				  (8,4,0,0,0,0,6,16),
-				  (8,3,0,0,0,0,0,10)
+Values(7,69,1,1,6,0,0,0),(7,15,1,1,0,6,0,0),(7,60,0,1,6,0,0,0),(7,6,0,1,0,6,0,0),(7,50,0,0,1,1,5,0),(7,5,0,0,0,2,5,0),(7,4,0,0,0,0,3,4),(7,3,0,0,0,0,0,4),
+(8,69,1,1,6,6,15,0),(8,15,1,1,0,12,15,0),(8,60,0,1,6,6,15,0),(8,6,0,1,0,12,15,0),(8,50,0,0,1,2,15,10),(8,5,0,0,0,3,15,10),(8,4,0,0,0,0,6,16),(8,3,0,0,0,0,0,10),
+(5,15,1,1,1,42,0,0),(5,6,0,1,1,42,0,0),(5,50,0,0,2,0,42,0),(5,5,0,0,0,2,42,0),(5,4,0,0,0,0,3,41),(5,3,0,0,0,0,0,4),
+(9,69,1,1,6,12,45,20),(9,15,1,1,0,18,45,20),(9,60,0,1,6,12,45,20),(9,6,0,1,0,18,45,20),(9,50,0,0,1,3,30,40),(9,5,0,0,0,4,30,40),(9,4,0,0,0,0,10,40),(9,3,0,0,0,0,0,20),
+(10,69,1,1,6,18,90,80),(10,15,1,1,0,24,90,80),(10,60,0,1,6,18,90,80),(10,6,0,1,0,24,90,80),(10,50,0,0,1,4,50,100),(10,5,0,0,0,5,50,100),(10,4,0,0,0,0,15,80),(10,3,0,0,0,0,0,35),
+(11,69,1,1,6,24,150,200),(11,15,1,1,0,30,150,200),(11,60,0,1,6,24,150,200),(11,6,0,1,0,30,150,200),(11,50,0,0,1,5,75,200),(11,5,0,0,0,6,75,200),(11,4,0,0,0,0,21,140),(11,3,0,0,0,0,0,56)
+(0,69,
+
 go
 --Para ello, crea un procedimiento AsignarPremios que calcule los premios de cada boleto y lo guarde en la base de datos.
 --Para saber cómo se asignan los premios, debes seguir las instrucciones de este documento, en especial el Capítulo V del Título I 
@@ -73,7 +65,7 @@ Begin
 	set @total=@total5+@total6+@total7+@total8+@total9+@total10+@total11  --total recaudado
 
 
-	--Calculamos según nuestra código el número de aciertos
+	--Calculamos según nuestro código el número de aciertos
 	Update Boletos set NumeroAcertados=NumeroAcertados+1
 	where IdBoleto=(
 	Select IdBoleto from Sorteos as S
@@ -142,6 +134,8 @@ Begin
 	--calculamos cuantos premios hay de cada tipo con la tabla premios y la columna NumeroAcertados
 	declare @especial money=0,@primera money=0,@segunda money=0
 	declare @tercera money=0,@cuarta money=0, @quinta money=0
+
+	Set @especial=
 
 End
 
