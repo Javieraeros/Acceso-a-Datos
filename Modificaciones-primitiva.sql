@@ -32,7 +32,7 @@ Values(7,69,1,1,6,0,0,0),(7,15,1,1,0,6,0,0),(7,60,0,1,6,0,0,0),(7,6,0,1,0,6,0,0)
 (9,69,1,1,6,12,45,20),(9,15,1,1,0,18,45,20),(9,60,0,1,6,12,45,20),(9,6,0,1,0,18,45,20),(9,50,0,0,1,3,30,40),(9,5,0,0,0,4,30,40),(9,4,0,0,0,0,10,40),(9,3,0,0,0,0,0,20),
 (10,69,1,1,6,18,90,80),(10,15,1,1,0,24,90,80),(10,60,0,1,6,18,90,80),(10,6,0,1,0,24,90,80),(10,50,0,0,1,4,50,100),(10,5,0,0,0,5,50,100),(10,4,0,0,0,0,15,80),(10,3,0,0,0,0,0,35),
 (11,69,1,1,6,24,150,200),(11,15,1,1,0,30,150,200),(11,60,0,1,6,24,150,200),(11,6,0,1,0,30,150,200),(11,50,0,0,1,5,75,200),(11,5,0,0,0,6,75,200),(11,4,0,0,0,0,21,140),(11,3,0,0,0,0,0,56)
-(0,69,
+
 
 go
 --Para ello, crea un procedimiento AsignarPremios que calcule los premios de cada boleto y lo guarde en la base de datos.
@@ -131,11 +131,16 @@ Begin
 	where NumeroAcertados=6 or NumeroAcertados=60 and B.Reintegro=S.rein
 	)
 
+	--Insertamos una fila en nuestra tabla premios en la que guardaremos cuántos premios hay de cada categoría:
+	--Pero primero eliminamos la anterior
+	delete from Premios where TipoApuesta=0
+	Insert into Premios Select count(*) from Boletos as B
+	inner join Premios as P
+	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+
 	--calculamos cuantos premios hay de cada tipo con la tabla premios y la columna NumeroAcertados
 	declare @especial money=0,@primera money=0,@segunda money=0
 	declare @tercera money=0,@cuarta money=0, @quinta money=0
-
-	Set @especial=
 
 End
 
