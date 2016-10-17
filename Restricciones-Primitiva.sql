@@ -7,10 +7,11 @@ Use PrimitivaJavi
 
 
 Go
-Create Trigger InsertarBoletoInvalido ON Boletos After insert,Update AS
+Alter Trigger InsertarBoletoInvalido ON Boletos After insert,Update AS
 	declare @fechaSorteo smalldatetime
-	select @fechaSorteo =FechaSorteo from Sorteos where (Select IdSorteo from inserted)=IdSorteo
+	select @fechaSorteo =FechaSorteo from Sorteos where (Select min(IdSorteo) from inserted)=IdSorteo
 
+	Select DATEDIFF(minute,current_timestamp,fechaSorteo) from Sorteos 
 	If(DateDiff(minute,Current_TimeStamp,@fechaSorteo)<60)
 	Begin
 		RollBack Transaction
