@@ -2,7 +2,7 @@
 Use PrimitivaJavi
 --Modifica la base de datos para que, una vez realizado el sorteo, se pueda asignar a cada boleto la cantidad ganada.
 Alter table Boletos add Premios smallmoney null
-Alter table Boletos add NumeroAcertados tinyint null
+Alter table Boletos add NumeroAcertados tinyint default 0 null 
 /*		-3 para tres aciertos
 		-4 para cuatro aciertos
 		-5 para cinco aciertos
@@ -64,38 +64,41 @@ Begin
 	set @total11=462*@tipo11
 	set @total=@total5+@total6+@total7+@total8+@total9+@total10+@total11  --total recaudado
 
+	
 
 	--Calculamos según nuestro código el número de aciertos
 	Update Boletos set NumeroAcertados=NumeroAcertados+1
-	where IdBoleto=(
+	where IdBoleto in (
 	Select IdBoleto from Sorteos as S
 	inner join NumerosBoletos as NB
 	on S.num1=Nb.Numero
 	where Nb.IdSorteo=@IdSorteo
 	)
+
+
 	Update Boletos set NumeroAcertados=NumeroAcertados+1
-	where IdBoleto=(
+	where IdBoleto in (
 	Select IdBoleto from Sorteos as S
 	inner join NumerosBoletos as NB
 	on S.num2=Nb.Numero
 	where Nb.IdSorteo=@IdSorteo
 	)
 	Update Boletos set NumeroAcertados=NumeroAcertados+1
-	where IdBoleto=(
+	where IdBoleto in (
 	Select IdBoleto from Sorteos as S
 	inner join NumerosBoletos as NB
 	on S.num3=Nb.Numero
 	where Nb.IdSorteo=@IdSorteo
 	)
 	Update Boletos set NumeroAcertados=NumeroAcertados+1
-	where IdBoleto=(
+	where IdBoleto in (
 	Select IdBoleto from Sorteos as S
 	inner join NumerosBoletos as NB
 	on S.num4=Nb.Numero
 	where Nb.IdSorteo=@IdSorteo
 	)
 	Update Boletos set NumeroAcertados=NumeroAcertados+1
-	where IdBoleto=(
+	where IdBoleto in (
 	Select IdBoleto from Sorteos as S
 	inner join NumerosBoletos as NB
 	on S.num5=Nb.Numero
@@ -109,14 +112,14 @@ Begin
 	where TipoApuesta=5
 
 	Update Boletos set NumeroAcertados=NumeroAcertados+1
-	where IdBoleto=(
+	where IdBoleto in (
 	Select IdBoleto from Sorteos as S
 	inner join NumerosBoletos as NB
 	on S.num6=Nb.Numero
 	where Nb.IdSorteo=@IdSorteo
 	)
 	Update Boletos set NumeroAcertados=NumeroAcertados*10
-	where IdBoleto=(
+	where IdBoleto in (
 	Select IdBoleto from Sorteos as S
 	inner join NumerosBoletos as NB
 	on S.comp=Nb.Numero
@@ -124,7 +127,7 @@ Begin
 	)
 
 	Update Boletos set NumeroAcertados=NumeroAcertados+9
-	where IdBoleto=(
+	where IdBoleto in (
 	Select IdBoleto from Boletos as B
 	inner join Sorteos as S
 	on B.IdSorteo=S.IdSorteo
@@ -133,10 +136,23 @@ Begin
 
 	--Insertamos una fila en nuestra tabla premios en la que guardaremos cuántos premios hay de cada categoría:
 	--Pero primero eliminamos la anterior
-	delete from Premios where TipoApuesta=0
-	Insert into Premios Select count(*) from Boletos as B
+	declare @premiosTemp as table (
+				IdSorteo bigint,
+				Especial int,
+				Primera int,
+				Segunda int,
+				Tercera int,
+				Cuarta int,
+				Quinta int)
+	--declare @IdSorteo bigint=15
+
+	Insert into @premiosTemp Select @IdSorteo,count(*)*Especial,count(*)*Primera,count(*)*Segunda,count(*)*Tercera,count(*)*Cuarta,count(*)*Quinta from Boletos as B
 	inner join Premios as P
 	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	group by Especial,Primera,Segunda,Tercera,Cuarta,Quinta
+
+	--Select * from Boletos
+	--Select * from @premiosTemp
 
 	--calculamos cuantos premios hay de cada tipo con la tabla premios y la columna NumeroAcertados
 	declare @especial money=0,@primera money=0,@segunda money=0
