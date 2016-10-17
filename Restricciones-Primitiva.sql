@@ -7,7 +7,7 @@ Use PrimitivaJavi
 
 
 Go
-Alter Trigger InsertarBoletoInvalido ON Boletos After insert,Update AS
+Create Trigger InsertarBoletoInvalido ON Boletos After insert,Update AS
 	declare @fechaSorteo smalldatetime
 	select @fechaSorteo =FechaSorteo from Sorteos where (Select min(IdSorteo) from inserted)=IdSorteo
 

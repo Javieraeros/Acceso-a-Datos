@@ -68,7 +68,7 @@ Begin
 		
 		BEGIN TRY  
    		Insert into NumerosBoletos(IdSorteo,IdBoleto,Numero)
-			Select * from @Numeros
+			Select IdSorteo,IdBoleto,Numero from @Numeros
 		END TRY  
 		BEGIN CATCH  
 			SET @SeFastidio = 1
