@@ -2,9 +2,10 @@ Use PrimitivaJavi
 go
 set dateformat 'ymd' 
 Insert into Sorteos(IdSorteo,FechaSorteo)
-Values (100,'20171008')
+Values (60,'20171008')
 declare @IdBoleto bigint
-Execute GrabaSencilla 15, 1,2,3,4,5,6,@IdBoleto
+Execute GrabaSencilla 50, 1,2,3,4,5,6,@IdBoleto
+Select @IdBoleto
 Select * from Boletos
 Select * from NumerosBoletos
 ORDER BY Numero

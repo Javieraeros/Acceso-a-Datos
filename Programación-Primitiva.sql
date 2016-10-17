@@ -4,7 +4,7 @@ Use PrimitivaJavi
 
 --Implementa un procedimiento almacenado GrabaSencilla que grabe una apuesta simple. Datos de entrada: El sorteo y los seis números
 go
-CREATE PROCEDURE GrabaSencilla @IdSorteo bigint,
+ALTER PROCEDURE GrabaSencilla @IdSorteo bigint,
 							   @num1 tinyint,@num2 tinyint,@num3 tinyint,@num4 tinyint,@num5 tinyint,@num6 tinyint,
 							   @IdBoleto bigint OUTPUT as
 Begin
