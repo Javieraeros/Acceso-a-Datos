@@ -65,7 +65,10 @@ Begin
 	set @total11=462*@tipo11
 	set @total=@total5+@total6+@total7+@total8+@total9+@total10+@total11  --total recaudado
 
-	
+	--Para evitar errores:
+	Update Boletos set NumeroAcertados=0 where IdSorteo=@IdSorteo
+
+	declare @IdSorteo bigint=15
 
 	--Calculamos según nuestro código el número de aciertos
 	Update Boletos set NumeroAcertados=NumeroAcertados+1
@@ -132,11 +135,12 @@ Begin
 	Select IdBoleto from Boletos as B
 	inner join Sorteos as S
 	on B.IdSorteo=S.IdSorteo
-	where NumeroAcertados=6 or NumeroAcertados=60 and B.Reintegro=S.rein
+	where (NumeroAcertados=6 or NumeroAcertados=60) and B.Reintegro=S.rein
 	)
 
 	--Insertamos una fila en nuestra tabla premios en la que guardaremos cuántos premios hay de cada categoría:
 	--Pero primero eliminamos la anterior
+	Begin Transaction 
 	declare @premiosTemp as table (
 				IdSorteo bigint,
 				Especial int,
@@ -145,16 +149,39 @@ Begin
 				Tercera int,
 				Cuarta int,
 				Quinta int)
-	--declare @IdSorteo bigint=15
 
-	Insert into @premiosTemp Select @IdSorteo,count(*)*Especial,count(*)*Primera,count(*)*Segunda,count(*)*Tercera,count(*)*Cuarta,count(*)*Quinta from Boletos as B
+	Insert into @premiosTemp(IdSorteo,Especial) Select @IdSorteo,count(*)*P.Especial
+	from Boletos as B
 	inner join Premios as P
 	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
-	group by Especial,Primera,Segunda,Tercera,Cuarta,Quinta
+	group by Especial
 
-	--Select * from Boletos
-	--Select * from @premiosTemp
+	Update @premiosTemp set Primera=count(*)*P.Primera
+	from Boletos as B
+	inner join Premios as P
+	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
 
+	Update @premiosTemp set Segunda=count(*)*P.Segunda
+	from Boletos as B
+	inner join Premios as P
+	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+
+	Update @premiosTemp set Tercera=count(*)*P.Tercera
+	from Boletos as B
+	inner join Premios as P
+	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+
+	Update @premiosTemp set Cuarta=count(*)*P.Cuarta
+	from Boletos as B
+	inner join Premios as P
+	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+
+	Update @premiosTemp set Quinta=count(*)*P.Quinta
+	from Boletos as B
+	inner join Premios as P
+	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	Commit Transaction
+	select * from @premiosTemp
 	--calculamos cuantos premios hay de cada tipo con la tabla premios y la columna NumeroAcertados
 	declare @especial money=0,@primera money=0,@segunda money=0
 	declare @tercera money=0,@cuarta money=0, @quinta money=0

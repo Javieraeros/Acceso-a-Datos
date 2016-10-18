@@ -4,10 +4,11 @@ Use PrimitivaJavi
 
 --Implementa un procedimiento almacenado GrabaSencilla que grabe una apuesta simple. Datos de entrada: El sorteo y los seis números
 go
-ALTER PROCEDURE GrabaSencilla @IdSorteo bigint,
+Create PROCEDURE GrabaSencilla @IdSorteo bigint,
 							   @num1 tinyint,@num2 tinyint,@num3 tinyint,@num4 tinyint,@num5 tinyint,@num6 tinyint,
 							   @IdBoleto bigint OUTPUT as
 Begin
+SET NOCOUNT ON
 	If(@num1<> @num2 and @num1<>@num3 and @num1<>@num4 and @num1<>@num5 and @num1<>@num6
 		 and @num2<>@num3 and @num2<>@num4 and @num2<>@num5 and @num2<>@num6
 		 and @num3<>@num4 and @num3<>@num5 and @num3<>@num6
@@ -27,33 +28,11 @@ Begin
 		set @Reintegro=ABS(checksum(NEWID()))%10
 
 		declare @SeFastidio bit=0
-
+		
 		Begin Transaction
 		Insert into Boletos(IdBoleto,IdSorteo,Reintegro,TipoApuesta)
 		Values(@IdBoleto,@IdSorteo,@Reintegro,6)
-
-		/*
-		--------------------Versión 1.0--------------------
-		Insert into NumeroBoleto(IdBoleto,IdSorteo,Numero)
-		Values(@IdBoleto,@IdSorteo,@num1)
-
-		Insert into NumeroBoleto(IdBoleto,IdSorteo,Numero)
-		Values(@IdBoleto,@IdSorteo,@num2)
-
-		Insert into NumeroBoleto(IdBoleto,IdSorteo,Numero)
-		Values(@IdBoleto,@IdSorteo,@num3)
-
-		Insert into NumeroBoleto(IdBoleto,IdSorteo,Numero)
-		Values(@IdBoleto,@IdSorteo,@num4)
-
-		Insert into NumeroBoleto(IdBoleto,IdSorteo,Numero)
-		Values(@IdBoleto,@IdSorteo,@num5)
-
-		Insert into NumeroBoleto(IdBoleto,IdSorteo,Numero)
-		Values(@IdBoleto,@IdSorteo,@num6)
-		*/
-
-
+		
 		DECLARE @Numeros as TABLE(
 		IdSorteo bigint not null,
 		IdBoleto bigint not null,
