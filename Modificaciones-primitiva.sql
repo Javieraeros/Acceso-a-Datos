@@ -1,7 +1,7 @@
 --Premios
 Use PrimitivaJavi
 --Modifica la base de datos para que, una vez realizado el sorteo, se pueda asignar a cada boleto la cantidad ganada.
-Alter table Boletos add Premios smallmoney null
+Alter table Boletos add Premio money null
 Alter table Boletos add NumeroAcertados tinyint default 0 null 
 /*		-3 para tres aciertos
 		-4 para cuatro aciertos
@@ -31,7 +31,8 @@ Values(7,69,1,1,6,0,0,0),(7,15,1,1,0,6,0,0),(7,60,0,1,6,0,0,0),(7,6,0,1,0,6,0,0)
 (5,15,1,1,1,42,0,0),(5,6,0,1,1,42,0,0),(5,50,0,0,2,0,42,0),(5,5,0,0,0,2,42,0),(5,4,0,0,0,0,3,41),(5,3,0,0,0,0,0,4),
 (9,69,1,1,6,12,45,20),(9,15,1,1,0,18,45,20),(9,60,0,1,6,12,45,20),(9,6,0,1,0,18,45,20),(9,50,0,0,1,3,30,40),(9,5,0,0,0,4,30,40),(9,4,0,0,0,0,10,40),(9,3,0,0,0,0,0,20),
 (10,69,1,1,6,18,90,80),(10,15,1,1,0,24,90,80),(10,60,0,1,6,18,90,80),(10,6,0,1,0,24,90,80),(10,50,0,0,1,4,50,100),(10,5,0,0,0,5,50,100),(10,4,0,0,0,0,15,80),(10,3,0,0,0,0,0,35),
-(11,69,1,1,6,24,150,200),(11,15,1,1,0,30,150,200),(11,60,0,1,6,24,150,200),(11,6,0,1,0,30,150,200),(11,50,0,0,1,5,75,200),(11,5,0,0,0,6,75,200),(11,4,0,0,0,0,21,140),(11,3,0,0,0,0,0,56)
+(11,69,1,1,6,24,150,200),(11,15,1,1,0,30,150,200),(11,60,0,1,6,24,150,200),(11,6,0,1,0,30,150,200),(11,50,0,0,1,5,75,200),(11,5,0,0,0,6,75,200),(11,4,0,0,0,0,21,140),(11,3,0,0,0,0,0,56),
+(6,15,1,0,0,0,0,0),(6,6,0,1,0,0,0,0),(6,50,0,0,1,0,0,0),(6,5,0,0,0,1,0,0),(6,4,0,0,0,0,1,0),(6,3,0,0,0,0,0,1)
 
 
 go
@@ -39,14 +40,28 @@ go
 --Para saber cómo se asignan los premios, debes seguir las instrucciones de este documento, en especial el Capítulo V del Título I 
 --(págs 7, 8, 9 y 10) y la tabla de la instrucción 21.4 (pág 14).
 Go
-Create Procedure AsignarPremios @IdSorteo bigint as
+Alter Procedure AsignarPremios @IdSorteo bigint as
 Begin
-	/*Primero tenemos que saber cuanto se ha recaudado, para ello contaremos el número de apuestas y las multiplicaremos por su coste*/
+	--Numero de apuestas de cada tipo
 	declare @tipo5 int,@tipo6 int,@tipo7 int,@tipo8 int
-	declare @tipo9 int, @tipo10 int,@tipo11 int,@total int
-	declare @total5 int,@total6 int,@total7 int,@total8 int
-	declare @total9 int,@total10 int,@total11 int,@total12 int
+	declare @tipo9 int, @tipo10 int,@tipo11 int
 
+	--Dinero recaudado por cada tipo, y total
+	declare @total5 money,@total6 money,@total7 money,@total8 money,@total9 money,@total10 money
+	declare @total11 money,@totalrecaudado money,@totalrepartir money,@totalreintegro money
+
+	--Número de aciertos de cada tipo de apuesta
+	declare @acertEspecial int,@acertPrimera int,@acertSegunda int,@acertTercera int,@acertCuarta int,@acertQuinta int 
+
+	--Cantidad de dinero que se le repartirá a cada tipo de premio (total)
+	declare @especial money=0,@primera money=0,@segunda money=0
+	declare @tercera money=0,@cuarta money=0, @quinta money=0
+
+	--Cantidad de dinero que se le dará a un acierto de cada tipo
+	declare @unitEspecial money=0,@unitPrimera money=0,@unitSegunda money=0
+	declare @unitTercera money=0,@unitCuarta money=0, @unitQuinta money=8
+
+	/*Primero tenemos que saber cuanto se ha recaudado, para ello contaremos el número de apuestas y las multiplicaremos por su coste*/
 	Select @tipo5=count(TipoApuesta) from Boletos where TipoApuesta=5 and IdSorteo=@IdSorteo
 	Select @tipo6=count(TipoApuesta) from Boletos where TipoApuesta=6 and IdSorteo=@IdSorteo
 	Select @tipo7=count(TipoApuesta) from Boletos where TipoApuesta=7 and IdSorteo=@IdSorteo
@@ -62,9 +77,14 @@ Begin
 	set @total9=84*@tipo9
 	set @total10=210*@tipo10
 	set @total11=462*@tipo11
-	set @total=@total5+@total6+@total7+@total8+@total9+@total10+@total11  --total recaudado
+	set @totalrecaudado=@total5+@total6+@total7+@total8+@total9+@total10+@total11  --total recaudado
 
-	
+	--Calculamos la cantidad a repartir entre las 5 categorías y el fondo para el reintegro
+	set @totalrepartir=@totalrecaudado*0.45
+	set @totalreintegro=@totalrecaudado*0.10
+
+	--Para evitar errores:
+	Update Boletos set NumeroAcertados=0 where IdSorteo=@IdSorteo
 
 	--Calculamos según nuestro código el número de aciertos
 	Update Boletos set NumeroAcertados=NumeroAcertados+1
@@ -74,8 +94,6 @@ Begin
 	on S.num1=Nb.Numero
 	where Nb.IdSorteo=@IdSorteo
 	)
-
-
 	Update Boletos set NumeroAcertados=NumeroAcertados+1
 	where IdBoleto in (
 	Select IdBoleto from Sorteos as S
@@ -125,38 +143,94 @@ Begin
 	on S.comp=Nb.Numero
 	where Nb.IdSorteo=@IdSorteo
 	)
-
 	Update Boletos set NumeroAcertados=NumeroAcertados+9
 	where IdBoleto in (
 	Select IdBoleto from Boletos as B
 	inner join Sorteos as S
 	on B.IdSorteo=S.IdSorteo
-	where NumeroAcertados=6 or NumeroAcertados=60 and B.Reintegro=S.rein
+	where (NumeroAcertados=6 or NumeroAcertados=60) and B.Reintegro=S.rein
 	)
 
-	--Insertamos una fila en nuestra tabla premios en la que guardaremos cuántos premios hay de cada categoría:
-	--Pero primero eliminamos la anterior
-	declare @premiosTemp as table (
-				IdSorteo bigint,
-				Especial int,
-				Primera int,
-				Segunda int,
-				Tercera int,
-				Cuarta int,
-				Quinta int)
-	--declare @IdSorteo bigint=15
-
-	Insert into @premiosTemp Select @IdSorteo,count(*)*Especial,count(*)*Primera,count(*)*Segunda,count(*)*Tercera,count(*)*Cuarta,count(*)*Quinta from Boletos as B
+	--Guardamos en las diferentes variables la cantidad de premios de cada tipo
+	Select @acertEspecial=count(*)*P.Especial
+	from Boletos as B
 	inner join Premios as P
 	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
-	group by Especial,Primera,Segunda,Tercera,Cuarta,Quinta
+	group by P.Especial
 
-	--Select * from Boletos
-	--Select * from @premiosTemp
+	Select @acertPrimera=count(*)*P.Primera
+	from Boletos as B
+	inner join Premios as P
+	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	group by P.Primera
 
-	--calculamos cuantos premios hay de cada tipo con la tabla premios y la columna NumeroAcertados
-	declare @especial money=0,@primera money=0,@segunda money=0
-	declare @tercera money=0,@cuarta money=0, @quinta money=0
+	select @acertSegunda=count(*)*P.Segunda
+	from Boletos as B
+	inner join Premios as P
+	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	group by Segunda
 
+	Select @acertTercera=count(*)*P.Tercera
+	from Boletos as B
+	inner join Premios as P
+	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	group by P.Tercera
+
+	Select @acertCuarta=count(*)*P.Cuarta
+	from Boletos as B
+	inner join Premios as P
+	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	group by P.Cuarta
+
+	Select @acertQuinta=count(*)*P.Quinta
+	from Boletos as B
+	inner join Premios as P
+	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	group by P.Quinta
+
+	--Calculamos ahora el total de dinero destinado a cada premio
+	set @quinta=@acertQuinta*@unitQuinta
+
+	set @totalrepartir=@totalrepartir-@quinta
+
+	set @especial=@totalrepartir*0.20
+	set @primera=@totalrepartir*0.40
+	set @segunda=@totalrepartir*0.06
+	set @tercera=@totalrepartir*0.13
+	set @cuarta=@totalrepartir*0.21
+
+	--calculamos el premio unitario
+	if(@acertEspecial=0)
+	set @unitEspecial=0
+	else
+	set @unitEspecial=@especial/@acertEspecial
+
+	if (@acertPrimera=0)
+	set @unitPrimera=0
+	else
+	set @unitprimera=@primera/@acertprimera
+
+	if (@acertSegunda=0)
+	set @unitSegunda=0
+	else
+	set @unitsegunda=@segunda/@acertsegunda
+
+	if (@acertTercera=0)
+	set @unitTercera=0
+	else
+	set @unitTercera=@tercera/@acerttercera
+
+	if (@acertCuarta=0)
+	set @unitCuarta=0
+	else
+	set @unitcuarta=@cuarta/@acertcuarta
+
+	--Calculamos el premio de cada boleto, con la tabla auxiliar y la columna del código de la tabla boletos
+	Update Boletos set Premio =(
+		Select P.Especial*@unitEspecial+P.Primera*@unitPrimera+
+			   P.Segunda*@unitSegunda+P.Tercera*@unitTercera+P.Cuarta*@unitCuarta+P.Quinta*@unitQuinta
+		from Premios as P
+		inner join Boletos as B
+		on P.TipoApuesta=B.TipoApuesta and P.NumerosAcertados=B.NumeroAcertados
+		where IdBoleto=31)
 End
-

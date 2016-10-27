@@ -1,10 +1,10 @@
 Use PrimitivaJavi
 go
-set dateformat 'mdy' 
+set dateformat 'ymd' 
 Insert into Sorteos(IdSorteo,FechaSorteo)
-Values (100,'20171008')
+Values (15,'20171008')
 declare @IdBoleto bigint
-Execute GrabaSencilla 100, 1,2,3,4,5,6,@IdBoleto
+Execute GrabaSencilla 15, 1,2,3,4,5,6,@IdBoleto OUTPUT
 Select * from Boletos
 Select * from NumersoBoletos
 ORDER BY Numero
@@ -18,11 +18,11 @@ Select * from Boletos
 Select * from NumeroBoletos
 
 Insert into Sorteos(IdSorteo,FechaSorteo)
-Values (10,'20161105')
+Values (9652,'20161105')
 
 
 declare @IdBoleto bigint
-Execute GrabaSencilla 10, 1,2,3,4,5,90,@IdBoleto
+Execute GrabaSencilla 9652, 1,2,3,4,5,90,@IdBoleto
 
 Update NumerosBoletos set Numero=8 where Numero=5 
 
@@ -46,3 +46,8 @@ Execute GrabaMuchasSencillas 15,500000 --Tiempo de inserción 322 segundos,tamaño
 Execute GrabaMuchasSencillas 15,1000000--Tiempo de inserción 637 segundos,tamaño 432.23MB
 
 Update Boletos set NumeroAcertados=0 where IdSorteo=15
+select * from Sorteos
+declare @IdBoleto bigint
+Execute GrabaSencilla 15,1,8,4,23,15,24,@IdBoleto
+Select * from Boletos
+Execute AsignarPremios 15
