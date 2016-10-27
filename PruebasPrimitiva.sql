@@ -50,3 +50,4 @@ select * from Sorteos
 declare @IdBoleto bigint
 Execute GrabaSencilla 15,1,8,4,23,15,24,@IdBoleto
 Select * from Boletos
+Execute AsignarPremios 15
