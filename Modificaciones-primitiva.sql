@@ -156,36 +156,42 @@ Begin
 	from Boletos as B
 	inner join Premios as P
 	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	where B.IdSorteo=@IdSorteo 
 	group by P.Especial
 
 	Select @acertPrimera=count(*)*P.Primera
 	from Boletos as B
 	inner join Premios as P
 	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	where B.IdSorteo=@IdSorteo 
 	group by P.Primera
 
 	select @acertSegunda=count(*)*P.Segunda
 	from Boletos as B
 	inner join Premios as P
 	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	where B.IdSorteo=@IdSorteo 
 	group by Segunda
 
 	Select @acertTercera=count(*)*P.Tercera
 	from Boletos as B
 	inner join Premios as P
 	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	where B.IdSorteo=@IdSorteo 
 	group by P.Tercera
 
 	Select @acertCuarta=count(*)*P.Cuarta
 	from Boletos as B
 	inner join Premios as P
 	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	where B.IdSorteo=@IdSorteo 
 	group by P.Cuarta
 
 	Select @acertQuinta=count(*)*P.Quinta
 	from Boletos as B
 	inner join Premios as P
 	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	where B.IdSorteo=@IdSorteo 
 	group by P.Quinta
 
 	--Calculamos ahora el total de dinero destinado a cada premio
@@ -232,5 +238,5 @@ Begin
 		from Premios as P
 		inner join Boletos as B
 		on P.TipoApuesta=B.TipoApuesta and P.NumerosAcertados=B.NumeroAcertados
-		where IdBoleto=31)
+		where Boletos.IdBoleto=B.IdBoleto and @IdSorteo=B.IdSorteo)
 End

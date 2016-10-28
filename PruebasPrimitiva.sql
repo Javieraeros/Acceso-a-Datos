@@ -49,5 +49,16 @@ Update Boletos set NumeroAcertados=0 where IdSorteo=15
 select * from Sorteos
 declare @IdBoleto bigint
 Execute GrabaSencilla 15,1,8,4,23,15,24,@IdBoleto
+Select sum(Premio) from Boletos
 Select * from Boletos
+Select sum(Premio) from Boletos where Premio<10
 Execute AsignarPremios 15
+
+Insert into Sorteos(IdSorteo,FechaSorteo)
+Values (16,'20171008')
+Update Sorteos set num1=1,num2=8,num3=4,num4=23,num5=15,num6=24,rein=5,comp=39
+where IdSorteo=16
+
+Execute GrabaMuchasSencillas 16,50000
+select * from Boletos where IdSorteo=16
+Execute AsignarPremios 16
