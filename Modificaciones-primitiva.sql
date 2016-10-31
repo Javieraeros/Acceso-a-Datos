@@ -40,7 +40,7 @@ go
 --Para saber cómo se asignan los premios, debes seguir las instrucciones de este documento, en especial el Capítulo V del Título I 
 --(págs 7, 8, 9 y 10) y la tabla de la instrucción 21.4 (pág 14).
 Go
-Alter Procedure AsignarPremios @IdSorteo bigint as
+Create Procedure AsignarPremios @IdSorteo bigint as
 Begin
 	--Numero de apuestas de cada tipo
 	declare @tipo5 int,@tipo6 int,@tipo7 int,@tipo8 int

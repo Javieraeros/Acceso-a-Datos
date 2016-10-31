@@ -59,6 +59,13 @@ Values (16,'20171008')
 Update Sorteos set num1=1,num2=8,num3=4,num4=23,num5=15,num6=24,rein=5,comp=39
 where IdSorteo=16
 
-Execute GrabaMuchasSencillas 16,50000
+Execute GrabaMuchasSencillas 16,10000
+
+declare @IdBoleto bigint
+Execute GrabaSencilla 16, 1,4,8,15,23,24,@IdBoleto
+
 select * from Boletos where IdSorteo=16
 Execute AsignarPremios 16
+select * from Boletos where IdSorteo=16
+order by Premio
+select count(*) from Boletos where NumeroAcertados=3
