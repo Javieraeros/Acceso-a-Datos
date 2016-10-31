@@ -40,7 +40,7 @@ go
 --Para saber cómo se asignan los premios, debes seguir las instrucciones de este documento, en especial el Capítulo V del Título I 
 --(págs 7, 8, 9 y 10) y la tabla de la instrucción 21.4 (pág 14).
 Go
-Alter Procedure AsignarPremios @IdSorteo bigint as
+Create Procedure AsignarPremios @IdSorteo bigint as
 Begin
 	--Numero de apuestas de cada tipo
 	declare @tipo5 int,@tipo6 int,@tipo7 int,@tipo8 int
@@ -156,36 +156,42 @@ Begin
 	from Boletos as B
 	inner join Premios as P
 	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	where B.IdSorteo=@IdSorteo 
 	group by P.Especial
 
 	Select @acertPrimera=count(*)*P.Primera
 	from Boletos as B
 	inner join Premios as P
 	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	where B.IdSorteo=@IdSorteo 
 	group by P.Primera
 
 	select @acertSegunda=count(*)*P.Segunda
 	from Boletos as B
 	inner join Premios as P
 	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	where B.IdSorteo=@IdSorteo 
 	group by Segunda
 
 	Select @acertTercera=count(*)*P.Tercera
 	from Boletos as B
 	inner join Premios as P
 	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	where B.IdSorteo=@IdSorteo 
 	group by P.Tercera
 
 	Select @acertCuarta=count(*)*P.Cuarta
 	from Boletos as B
 	inner join Premios as P
 	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	where B.IdSorteo=@IdSorteo 
 	group by P.Cuarta
 
 	Select @acertQuinta=count(*)*P.Quinta
 	from Boletos as B
 	inner join Premios as P
 	on B.NumeroAcertados=P.NumerosAcertados and B.TipoApuesta=P.TipoApuesta
+	where B.IdSorteo=@IdSorteo 
 	group by P.Quinta
 
 	--Calculamos ahora el total de dinero destinado a cada premio
@@ -232,5 +238,5 @@ Begin
 		from Premios as P
 		inner join Boletos as B
 		on P.TipoApuesta=B.TipoApuesta and P.NumerosAcertados=B.NumeroAcertados
-		where IdBoleto=31)
+		where Boletos.IdBoleto=B.IdBoleto and @IdSorteo=B.IdSorteo)
 End
